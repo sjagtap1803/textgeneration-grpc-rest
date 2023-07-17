@@ -59,7 +59,7 @@ def serve():
     textgeneration_pb2_grpc.add_TextGenerationServicer_to_server(TextGenerationServicer(model="distilgpt2"), server)
     server.add_insecure_port('[::]:' + port)
     server.start()
-    print(f'Server is listening on port {port}')
+    print(f'grpc server is listening on port {port}')
     server.wait_for_termination()
 
 

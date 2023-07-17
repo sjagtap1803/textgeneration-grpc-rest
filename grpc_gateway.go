@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"strconv"
 
 	"github.com/golang/glog"
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
@@ -49,6 +50,7 @@ func run() error {
 	}
 
 	// Start HTTP server (and proxy calls to gRPC server endpoint)
+	fmt.Println("grpc gateway listening on port 50052")
 	return http.ListenAndServe(":50052", mux)
 }
 
@@ -72,7 +74,7 @@ func UploadSingleFile(w http.ResponseWriter, r *http.Request, pathParams map[str
 	buffer := &bytes.Buffer{}
 	_, err = io.Copy(buffer, multipartFile)
 	if err != nil {
-		http.Error(w, fmt.Sprintf("Could not read file contents of file 'file': %s", err.Error()), http.StatusBadRequest)
+		http.Error(w, fmt.Sprintf("Could not read contents of file 'file': %s", err.Error()), http.StatusBadRequest)
 		return
 	}
 
@@ -98,12 +100,12 @@ func UploadSingleFile(w http.ResponseWriter, r *http.Request, pathParams map[str
 
 	// Write response to client
 	w.WriteHeader(http.StatusOK)
-	w.Write([]byte("{\"result\": {\"text\": \"" + response.Text + "\"}\n"))
+	w.Write([]byte("{\"result\": {\"text\": " + strconv.Quote(response.Text) + "}}"))
 }
 
 func UploadMultipleFiles(w http.ResponseWriter, r *http.Request, pathParams map[string]string) {
 	// Parse Form from the request
-	err := r.ParseMultipartForm(20000000000)
+	err := r.ParseMultipartForm(20 << 32)
 	if err != nil {
 		if err != nil {
 			http.Error(w, fmt.Sprintf("failed to parse form: %s", err.Error()), http.StatusBadRequest)
@@ -137,9 +139,9 @@ func UploadMultipleFiles(w http.ResponseWriter, r *http.Request, pathParams map[
 	}
 
 	buffer := &bytes.Buffer{}
-	w.WriteHeader(http.StatusOK)
+	responsebody := ""
 
-	// receive stream of responses from server via go routine
+	// receive stream of responses from server via go routine and collect all responses in a string
 	go func() {
 		for {
 			in, err := stream.Recv()
@@ -151,11 +153,11 @@ func UploadMultipleFiles(w http.ResponseWriter, r *http.Request, pathParams map[
 				http.Error(w, fmt.Sprintf("Could not receive response from server: %s", err.Error()), http.StatusInternalServerError)
 				return
 			}
-			w.Write([]byte("{\"result\": {\"text\": \"" + in.Text + "\"}\n"))
+			responsebody = responsebody + "{\"result\": {\"text\": " + strconv.Quote(in.Text) + "}}\n"
 		}
 	}()
 
-	// send stream of responses to server via channel
+	// send stream of requests to server via channel
 	for _, file := range files {
 		f, err := file.Open()
 		if err != nil {
@@ -165,7 +167,7 @@ func UploadMultipleFiles(w http.ResponseWriter, r *http.Request, pathParams map[
 		defer f.Close()
 		_, err = io.Copy(buffer, f)
 		if err != nil {
-			http.Error(w, fmt.Sprintf("Could not read file contents of file: %s", err.Error()), http.StatusBadRequest)
+			http.Error(w, fmt.Sprintf("Could not read contents of file: %s", err.Error()), http.StatusBadRequest)
 			return
 		}
 
@@ -179,6 +181,8 @@ func UploadMultipleFiles(w http.ResponseWriter, r *http.Request, pathParams map[
 	}
 	stream.CloseSend()
 	<-waitc
+	w.WriteHeader(http.StatusOK)
+	w.Write([]byte(responsebody))
 }
 
 func main() {
