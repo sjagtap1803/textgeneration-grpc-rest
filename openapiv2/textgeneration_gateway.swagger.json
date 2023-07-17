@@ -1,0 +1,312 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "textgeneration_gateway.proto",
+    "version": "version not set"
+  },
+  "tags": [
+    {
+      "name": "TextGeneration"
+    }
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/v1/textgeneration/multi-upload": {
+      "post": {
+        "summary": "Upload multiple files and get back a stream of responses",
+        "operationId": "TextGeneration_MultiFileUpload",
+        "responses": {
+          "200": {
+            "description": "A successful response.(streaming responses)",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "result": {
+                  "$ref": "#/definitions/textgenerationTextGenResponse"
+                },
+                "error": {
+                  "$ref": "#/definitions/rpcStatus"
+                }
+              },
+              "title": "Stream result of textgenerationTextGenResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "description": " (streaming inputs)",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/textgenerationFileUpload"
+            }
+          }
+        ],
+        "tags": [
+          "TextGeneration"
+        ]
+      }
+    },
+    "/v1/textgeneration/single-upload": {
+      "post": {
+        "summary": "Upload a text file with input prompt and receive a response",
+        "operationId": "TextGeneration_SingleFileUpload",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/textgenerationTextGenResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/textgenerationFileUpload"
+            }
+          }
+        ],
+        "tags": [
+          "TextGeneration"
+        ]
+      }
+    },
+    "/v1/textgeneration/stream-stream": {
+      "post": {
+        "summary": "Sends a stream of responses for a stream of requests",
+        "operationId": "TextGeneration_ProcessTextGenStream",
+        "responses": {
+          "200": {
+            "description": "A successful response.(streaming responses)",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "result": {
+                  "$ref": "#/definitions/textgenerationTextGenResponse"
+                },
+                "error": {
+                  "$ref": "#/definitions/rpcStatus"
+                }
+              },
+              "title": "Stream result of textgenerationTextGenResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "description": " (streaming inputs)",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/textgenerationTextGenPrompt"
+            }
+          }
+        ],
+        "tags": [
+          "TextGeneration"
+        ]
+      }
+    },
+    "/v1/textgeneration/stream-unary": {
+      "post": {
+        "summary": "Sends a single response for a stream of prompt requests",
+        "operationId": "TextGeneration_ProcessTextGenStreamRequest",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/textgenerationTextGenResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "description": " (streaming inputs)",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/textgenerationTextGenPrompt"
+            }
+          }
+        ],
+        "tags": [
+          "TextGeneration"
+        ]
+      }
+    },
+    "/v1/textgeneration/unary-stream": {
+      "post": {
+        "summary": "Sends a stream of 3 responses for a single prompt request",
+        "operationId": "TextGeneration_ProcessTextGenMultiStream",
+        "responses": {
+          "200": {
+            "description": "A successful response.(streaming responses)",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "result": {
+                  "$ref": "#/definitions/textgenerationTextGenResponse"
+                },
+                "error": {
+                  "$ref": "#/definitions/rpcStatus"
+                }
+              },
+              "title": "Stream result of textgenerationTextGenResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/textgenerationTextGenPrompt"
+            }
+          }
+        ],
+        "tags": [
+          "TextGeneration"
+        ]
+      }
+    },
+    "/v1/textgeneration/unary-unary": {
+      "post": {
+        "summary": "Sends a respone containing model generated text and expects a single response from the server",
+        "operationId": "TextGeneration_ProcessTextGen",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/textgenerationTextGenResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/textgenerationTextGenPrompt"
+            }
+          }
+        ],
+        "tags": [
+          "TextGeneration"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "protobufAny": {
+      "type": "object",
+      "properties": {
+        "@type": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": {}
+    },
+    "rpcStatus": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/protobufAny"
+          }
+        }
+      }
+    },
+    "textgenerationFileUpload": {
+      "type": "object",
+      "properties": {
+        "filename": {
+          "type": "string"
+        },
+        "filedata": {
+          "type": "string",
+          "format": "byte"
+        }
+      },
+      "title": "request message for uploading a file"
+    },
+    "textgenerationTextGenPrompt": {
+      "type": "object",
+      "properties": {
+        "prompt": {
+          "type": "string"
+        },
+        "cleanup": {
+          "type": "boolean"
+        }
+      },
+      "title": "request message containing the input prompt"
+    },
+    "textgenerationTextGenResponse": {
+      "type": "object",
+      "properties": {
+        "text": {
+          "type": "string"
+        }
+      },
+      "title": "response message containing output generated by the model"
+    }
+  }
+}
