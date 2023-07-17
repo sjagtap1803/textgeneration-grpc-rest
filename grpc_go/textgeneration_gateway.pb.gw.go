@@ -2,11 +2,11 @@
 // source: textgeneration_gateway.proto
 
 /*
-Package grpc_gateway is a reverse proxy.
+Package grpc_go is a reverse proxy.
 
 It translates gRPC into RESTful JSON APIs.
 */
-package grpc_gateway
+package grpc_go
 
 import (
 	"context"

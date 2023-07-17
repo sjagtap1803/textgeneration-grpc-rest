@@ -6,7 +6,7 @@
 // - protoc             v3.6.1
 // source: textgeneration_go.proto
 
-package grpc_gateway
+package grpc_go
 
 import (
 	context "context"

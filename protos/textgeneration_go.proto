@@ -2,7 +2,7 @@
 
 syntax = "proto3";
 
-option go_package = "./grpc-gateway";
+option go_package = "./grpc_go";
 
 package textgeneration;
 
