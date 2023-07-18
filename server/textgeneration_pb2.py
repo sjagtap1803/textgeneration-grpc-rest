@@ -13,14 +13,13 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x14textgeneration.proto\x12\x0etextgeneration\"0\n\rTextGenPrompt\x12\x0e\n\x06prompt\x18\x01 \x01(\t\x12\x0f\n\x07\x63leanup\x18\x02 \x01(\x08\"\x1f\n\x0fTextGenResponse\x12\x0c\n\x04text\x18\x01 \x01(\t\"D\n\nFileUpload\x12\x12\n\x08\x66ilename\x18\x01 \x01(\tH\x00\x12\x12\n\x08\x66iledata\x18\x02 \x01(\x0cH\x00\x42\x0e\n\x0cupload_oneof2\xaf\x04\n\x0eTextGeneration\x12R\n\x0eProcessTextGen\x12\x1d.textgeneration.TextGenPrompt\x1a\x1f.textgeneration.TextGenResponse\"\x00\x12_\n\x19ProcessTextGenMultiStream\x12\x1d.textgeneration.TextGenPrompt\x1a\x1f.textgeneration.TextGenResponse\"\x00\x30\x01\x12\x61\n\x1bProcessTextGenStreamRequest\x12\x1d.textgeneration.TextGenPrompt\x1a\x1f.textgeneration.TextGenResponse\"\x00(\x01\x12\\\n\x14ProcessTextGenStream\x12\x1d.textgeneration.TextGenPrompt\x1a\x1f.textgeneration.TextGenResponse\"\x00(\x01\x30\x01\x12Q\n\x10SingleFileUpload\x12\x1a.textgeneration.FileUpload\x1a\x1f.textgeneration.TextGenResponse\"\x00\x12T\n\x0fMultiFileUpload\x12\x1a.textgeneration.FileUpload\x1a\x1f.textgeneration.TextGenResponse\"\x00(\x01\x30\x01\x42\x10Z\x0e./grpc-gatewayb\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x14textgeneration.proto\x12\x0etextgeneration\"0\n\rTextGenPrompt\x12\x0e\n\x06prompt\x18\x01 \x01(\t\x12\x0f\n\x07\x63leanup\x18\x02 \x01(\x08\"\x1f\n\x0fTextGenResponse\x12\x0c\n\x04text\x18\x01 \x01(\t\"D\n\nFileUpload\x12\x12\n\x08\x66ilename\x18\x01 \x01(\tH\x00\x12\x12\n\x08\x66iledata\x18\x02 \x01(\x0cH\x00\x42\x0e\n\x0cupload_oneof2\xaf\x04\n\x0eTextGeneration\x12R\n\x0eProcessTextGen\x12\x1d.textgeneration.TextGenPrompt\x1a\x1f.textgeneration.TextGenResponse\"\x00\x12_\n\x19ProcessTextGenMultiStream\x12\x1d.textgeneration.TextGenPrompt\x1a\x1f.textgeneration.TextGenResponse\"\x00\x30\x01\x12\x61\n\x1bProcessTextGenStreamRequest\x12\x1d.textgeneration.TextGenPrompt\x1a\x1f.textgeneration.TextGenResponse\"\x00(\x01\x12\\\n\x14ProcessTextGenStream\x12\x1d.textgeneration.TextGenPrompt\x1a\x1f.textgeneration.TextGenResponse\"\x00(\x01\x30\x01\x12Q\n\x10SingleFileUpload\x12\x1a.textgeneration.FileUpload\x1a\x1f.textgeneration.TextGenResponse\"\x00\x12T\n\x0fMultiFileUpload\x12\x1a.textgeneration.FileUpload\x1a\x1f.textgeneration.TextGenResponse\"\x00(\x01\x30\x01\x62\x06proto3')
 
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, globals())
 _builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, 'textgeneration_pb2', globals())
 if _descriptor._USE_C_DESCRIPTORS == False:
 
   DESCRIPTOR._options = None
-  DESCRIPTOR._serialized_options = b'Z\016./grpc-gateway'
   _TEXTGENPROMPT._serialized_start=40
   _TEXTGENPROMPT._serialized_end=88
   _TEXTGENRESPONSE._serialized_start=90

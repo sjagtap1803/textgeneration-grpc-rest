@@ -1,6 +1,6 @@
 import logging
 from concurrent import futures
-from transformers import pipeline, AutoModel
+from transformers import pipeline
 
 
 import grpc
