@@ -1,3 +1,4 @@
+import logging
 import requests
 
 
@@ -10,19 +11,19 @@ class RestClient():
         self.timeout = 60
         self.headers = {'Content-Type': 'application/x-www-form-urlencoded'}
 
-    def guide_process_text_gen(self, prompt):
+    def run_process_text_gen(self, prompt):
         connect_textgen = f"{self.connection_url}/unary-unary"
         data = '{"prompt": ' + f'"{prompt}"' + '}'
         req = requests.post(url=connect_textgen, headers=self.headers, data=data, timeout=self.timeout)
         return req
 
-    def guide_process_text_gen_multi_stream(self, prompt):
+    def run_process_text_gen_multi_stream(self, prompt):
         connect_textgen = f"{self.connection_url}/unary-stream"
         data = '{"prompt": ' + f'"{prompt}"' + '}'
         req = requests.post(url=connect_textgen, headers=self.headers, data=data, timeout=self.timeout)
         return req
 
-    def guide_process_text_gen_stream_request(self, prompts: list):
+    def run_process_text_gen_stream_request(self, prompts: list):
         connect_textgen = f"{self.connection_url}/stream-unary"
         data = ""
         for prompt in prompts:
@@ -30,7 +31,7 @@ class RestClient():
         req = requests.post(url=connect_textgen, headers=self.headers, data=data, timeout=self.timeout)
         return req
 
-    def guide_process_text_gen_stream(self, prompts: list):
+    def run_process_text_gen_stream(self, prompts: list):
         connect_textgen = f"{self.connection_url}/stream-stream"
         data = ""
         for prompt in prompts:
@@ -38,30 +39,55 @@ class RestClient():
         req = requests.post(url=connect_textgen, headers=self.headers, data=data, timeout=self.timeout)
         return req
 
+    def run_single_file_upload(self, file):
+        connect_textgen = f"{self.connection_url}/single-upload"
+        files = {
+            'file': open(file, 'rb')
+        }
+        req = requests.post(url=connect_textgen, files=files)
+        return req
+
+    def run_multi_file_upload(self, files: list):
+        connect_textgen = f"{self.connection_url}/multi-upload"
+        files = [('files', open(file, 'rb')) for file in files]
+        req = requests.post(url=connect_textgen, files=files)
+        return req
+
 
 def run():
     client = RestClient("localhost", "50052", "v1/textgeneration")
 
-    print("Testing Unary RPC with single prompt...")
-    response = client.guide_process_text_gen("Far far away there was a")
-    print(response.content.decode())
-    print("Success")
+    print("Running Unary RPC with single prompt...")
+    response = client.run_process_text_gen("Far far away there was a")
+    print(repr(response.content.decode()))
+    print("Success\n")
 
-    print("Testing Unary-Stream RPC...")
-    response = client.guide_process_text_gen_multi_stream("Far far away there was a")
-    print(response.content.decode())
-    print("Success")
+    print("Running Unary-Stream RPC...")
+    response = client.run_process_text_gen_multi_stream("Far far away there was a")
+    print(repr(response.content.decode()))
+    print("Success\n")
 
-    print("Testing Stream-Unary RPC...")
-    response = client.guide_process_text_gen_stream_request(["Far far away", "There was a", "name was John Doe"])
-    print(response.content.decode())
-    print("Success")
+    print("Running Stream-Unary RPC...")
+    response = client.run_process_text_gen_stream_request(["Far far away", "There was a", "name was John Doe"])
+    print(repr(response.content.decode()))
+    print("Success\n")
 
-    print("Testing Stream-Stream RPC...")
-    response = client.guide_process_text_gen_stream(["Far far away", "There was a", "name was John Doe"])
-    print(response.content.decode())
+    print("Running Stream-Stream RPC...")
+    response = client.run_process_text_gen_stream(["Far far away", "There was a", "name was John Doe"])
+    print(repr(response.content.decode()))
+    print("Success\n")
+
+    print("Running single file upload RPC...")
+    response = client.run_single_file_upload("./data/data1.txt")
+    print(repr(response.content.decode()))
+    print("Success\n")
+
+    print("Running multiple file upload RPC...")
+    response = client.run_multi_file_upload(["./data/data1.txt", "./data/data2.txt", "./data/data3.txt"])
+    print(repr(response.content.decode()))
     print("Success")
     
 
 if __name__ == "__main__":
+    logging.basicConfig()
     run()
