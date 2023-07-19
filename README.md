@@ -18,18 +18,9 @@ The repo also contains scripts to re-generate gRPC code in both Python (`compile
 ```
 $ pip install -r requirements.txt
 ```
-### Go
+### Go (Optional)
+Note: Follow the below instructions only if you wish to re-compile the proto files.
 1. Download and install Go (https://go.dev/doc/install)
-2. Install the protocol compiler.
-```
-$ apt-get install -y protobuf-compiler
-```
-3. Download some dependencies and update `PATH`.
-```
-$ go install google.golang.org/protobuf/cmd/protoc-gen-go@latest
-$ go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest
-$ go install github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-grpc-gateway@latest
-$ go install github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-openapiv2@latest
-$ export PATH="$PATH:$(go env GOPATH)/bin"
+2. Refer to the 'Prerequisites' section at https://grpc.io/docs/languages/go/quickstart/
 
 The compile scripts should work after following the above instructions. Further instructions can be found in individual directories.
