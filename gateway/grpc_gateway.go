@@ -21,6 +21,14 @@ var (
 	// command-line options:
 	// gRPC server endpoint
 	grpcServerEndpoint = flag.String("grpc-server-endpoint", "localhost:50051", "gRPC server endpoint")
+
+	// http to gRPC status code mapping
+	errorMap = map[string]string{
+		"StatusOK":                  "0",
+		"StatusBadRequest":          "3",
+		"StatusInternalServerError": "13",
+		"StatusServiceUnavailable":  "14",
+	}
 )
 
 func run() error {
@@ -54,18 +62,22 @@ func run() error {
 	return http.ListenAndServe(":50052", mux)
 }
 
+func createErrorResponse(status string, err error) string {
+	return fmt.Sprintf("{\"code\":%s, \"message\":%s, \"details\": []}", errorMap[status], strconv.Quote(err.Error()))
+}
+
 func UploadSingleFile(w http.ResponseWriter, r *http.Request, pathParams map[string]string) {
 	// Parse Form from the request
 	err := r.ParseForm()
 	if err != nil {
-		http.Error(w, fmt.Sprintf("failed to parse form: %s", err.Error()), http.StatusBadRequest)
+		http.Error(w, createErrorResponse("StatusBadRequest", err), http.StatusBadRequest)
 		return
 	}
 
 	// Read file components
 	multipartFile, _, err := r.FormFile("file")
 	if err != nil {
-		http.Error(w, fmt.Sprintf("failed to get file 'file': %s", err.Error()), http.StatusBadRequest)
+		http.Error(w, createErrorResponse("StatusBadRequest", err), http.StatusBadRequest)
 		return
 	}
 	defer multipartFile.Close()
@@ -74,7 +86,7 @@ func UploadSingleFile(w http.ResponseWriter, r *http.Request, pathParams map[str
 	buffer := &bytes.Buffer{}
 	_, err = io.Copy(buffer, multipartFile)
 	if err != nil {
-		http.Error(w, fmt.Sprintf("Could not read contents of file 'file': %s", err.Error()), http.StatusBadRequest)
+		http.Error(w, createErrorResponse("StatusBadRequest", err), http.StatusBadRequest)
 		return
 	}
 
@@ -84,7 +96,7 @@ func UploadSingleFile(w http.ResponseWriter, r *http.Request, pathParams map[str
 	// Setup grpc client stub
 	conn, err := grpc.Dial(*grpcServerEndpoint, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
-		http.Error(w, fmt.Sprintf("Could not connect to grpc server: %s", err.Error()), http.StatusBadGateway)
+		http.Error(w, createErrorResponse("StatusServiceUnavailable", err), http.StatusServiceUnavailable)
 		return
 	}
 	defer conn.Close()
@@ -94,13 +106,13 @@ func UploadSingleFile(w http.ResponseWriter, r *http.Request, pathParams map[str
 	ctx := context.Background()
 	response, err := client.SingleFileUpload(ctx, &gw.FileUpload{UploadOneof: &gw.FileUpload_Filedata{filedata}})
 	if err != nil {
-		http.Error(w, fmt.Sprintf("Server could not process rpc: %s", err.Error()), http.StatusInternalServerError)
+		http.Error(w, createErrorResponse("StatusInternalServerError", err), http.StatusInternalServerError)
 		return
 	}
 
 	// Write response to client
 	w.WriteHeader(http.StatusOK)
-	w.Write([]byte("{\"result\": {\"text\": " + strconv.Quote(response.Text) + "}}"))
+	w.Write([]byte("{\"text\": " + strconv.Quote(response.Text) + "}"))
 }
 
 func UploadMultipleFiles(w http.ResponseWriter, r *http.Request, pathParams map[string]string) {
@@ -108,7 +120,7 @@ func UploadMultipleFiles(w http.ResponseWriter, r *http.Request, pathParams map[
 	err := r.ParseMultipartForm(20 << 32)
 	if err != nil {
 		if err != nil {
-			http.Error(w, fmt.Sprintf("failed to parse form: %s", err.Error()), http.StatusBadRequest)
+			http.Error(w, createErrorResponse("StatusBadRequest", err), http.StatusBadRequest)
 			return
 		}
 	}
@@ -116,7 +128,7 @@ func UploadMultipleFiles(w http.ResponseWriter, r *http.Request, pathParams map[
 	// Setup grpc client stub
 	conn, err := grpc.Dial(*grpcServerEndpoint, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
-		http.Error(w, fmt.Sprintf("Could not connect to grpc server: %s", err.Error()), http.StatusBadGateway)
+		http.Error(w, createErrorResponse("StatusServiceUnavailable", err), http.StatusServiceUnavailable)
 		return
 	}
 	defer conn.Close()
@@ -126,7 +138,7 @@ func UploadMultipleFiles(w http.ResponseWriter, r *http.Request, pathParams map[
 	ctx := context.Background()
 	stream, err := client.MultiFileUpload(ctx)
 	if err != nil {
-		http.Error(w, fmt.Sprintf("Server could not process rpc: %s", err.Error()), http.StatusInternalServerError)
+		http.Error(w, createErrorResponse("StatusInternalServerError", err), http.StatusInternalServerError)
 		return
 	}
 	waitc := make(chan struct{})
@@ -134,7 +146,7 @@ func UploadMultipleFiles(w http.ResponseWriter, r *http.Request, pathParams map[
 	// Iterate over uploaded files
 	files := r.MultipartForm.File["files"]
 	if len(files) == 0 {
-		http.Error(w, "Could not find files", http.StatusBadRequest)
+		http.Error(w, createErrorResponse("StatusBadRequest", err), http.StatusBadRequest)
 		return
 	}
 
@@ -150,7 +162,7 @@ func UploadMultipleFiles(w http.ResponseWriter, r *http.Request, pathParams map[
 				return
 			}
 			if err != nil {
-				http.Error(w, fmt.Sprintf("Could not receive response from server: %s", err.Error()), http.StatusInternalServerError)
+				http.Error(w, createErrorResponse("StatusInternalServerError", err), http.StatusInternalServerError)
 				return
 			}
 			responsebody = responsebody + "{\"result\": {\"text\": " + strconv.Quote(in.Text) + "}}\n"
@@ -161,20 +173,20 @@ func UploadMultipleFiles(w http.ResponseWriter, r *http.Request, pathParams map[
 	for _, file := range files {
 		f, err := file.Open()
 		if err != nil {
-			http.Error(w, fmt.Sprintf("Could not open file: %s", err.Error()), http.StatusBadRequest)
+			http.Error(w, createErrorResponse("StatusBadRequest", err), http.StatusBadRequest)
 			return
 		}
 		defer f.Close()
 		_, err = io.Copy(buffer, f)
 		if err != nil {
-			http.Error(w, fmt.Sprintf("Could not read contents of file: %s", err.Error()), http.StatusBadRequest)
+			http.Error(w, createErrorResponse("StatusBadRequest", err), http.StatusBadRequest)
 			return
 		}
 
 		filedata := buffer.Bytes()
 		err = stream.Send(&gw.FileUpload{UploadOneof: &gw.FileUpload_Filedata{filedata}})
 		if err != nil {
-			http.Error(w, fmt.Sprintf("Could not stream requests to server: %s", err.Error()), http.StatusInternalServerError)
+			http.Error(w, createErrorResponse("StatusInternalServerError", err), http.StatusInternalServerError)
 			return
 		}
 		buffer.Reset()
