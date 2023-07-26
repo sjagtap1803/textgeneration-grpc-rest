@@ -1,4 +1,6 @@
 import logging
+import yaml
+from yaml.loader import SafeLoader
 from concurrent import futures
 from transformers import pipeline
 
@@ -55,9 +57,13 @@ class TextGenerationServicer(textgeneration_pb2_grpc.TextGenerationServicer):
         
 
 def serve():
-    port = '50051'
+    cfg_file = "./server_config.yaml"
+    with open(cfg_file) as c_info_file:
+        server_cfg = yaml.load(c_info_file, Loader=SafeLoader)
+
+    port = server_cfg["server_info"]["server_port"]
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
-    textgeneration_pb2_grpc.add_TextGenerationServicer_to_server(TextGenerationServicer(model="distilgpt2"), server)
+    textgeneration_pb2_grpc.add_TextGenerationServicer_to_server(TextGenerationServicer(model=server_cfg["model_info"]["model"]), server)
     server.add_insecure_port('[::]:' + port)
     server.start()
     print(f'grpc server is listening on port {port}')

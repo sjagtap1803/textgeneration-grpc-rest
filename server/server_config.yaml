@@ -1,0 +1,6 @@
+server_info:
+  server_address: localhost
+  server_port: "50051"
+
+model_info:
+  model: distilgpt2
