@@ -1,4 +1,6 @@
 import logging
+import yaml
+from yaml.loader import SafeLoader
 
 import grpc
 import textgeneration_pb2
@@ -82,7 +84,12 @@ class GrpcClient():
 
 
 def run():
-    client = GrpcClient("localhost", "50051")
+    cfg_file = "./client_config.yaml"
+    with open(cfg_file) as c_info_file:
+        client_cfg = yaml.load(c_info_file, Loader=SafeLoader)
+
+    grpc_cfg = client_cfg["grpc_info"]
+    client = GrpcClient(grpc_cfg["address"], grpc_cfg["port"])
 
     print("Running Unary RPC with single prompt...")
     client.run_process_text_gen("Far far away there was a")

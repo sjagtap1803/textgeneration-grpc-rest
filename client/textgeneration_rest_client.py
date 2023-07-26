@@ -1,5 +1,7 @@
 import logging
 import requests
+import yaml
+from yaml.loader import SafeLoader
 
 
 class RestClient():
@@ -55,7 +57,12 @@ class RestClient():
 
 
 def run():
-    client = RestClient("localhost", "50052", "v1/textgeneration")
+    cfg_file = "./client_config.yaml"
+    with open(cfg_file) as c_info_file:
+        client_cfg = yaml.load(c_info_file, Loader=SafeLoader)
+
+    rest_cfg = client_cfg["rest_info"]
+    client = RestClient(rest_cfg["address"], rest_cfg["port"], rest_cfg["route"])
 
     print("Running Unary RPC with single prompt...")
     response = client.run_process_text_gen("Far far away there was a")
