@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"os"
 	"strconv"
 
 	"github.com/golang/glog"
@@ -20,7 +21,7 @@ import (
 var (
 	// command-line options:
 	// gRPC server endpoint
-	grpcServerEndpoint = flag.String("grpc-server-endpoint", "localhost:50051", "gRPC server endpoint")
+	grpcServerEndpoint = flag.String("grpc-server-endpoint", fmt.Sprintf("%s:%s", os.Getenv("SERVER_ADDR"), os.Getenv("SERVER_PORT")), "gRPC server endpoint")
 
 	// http to gRPC status code mapping
 	errorMap = map[string]string{
@@ -59,7 +60,7 @@ func run() error {
 
 	// Start HTTP server (and proxy calls to gRPC server endpoint)
 	fmt.Println("grpc gateway listening on port 50052")
-	return http.ListenAndServe(":50052", mux)
+	return http.ListenAndServe(fmt.Sprintf(":%s", os.Getenv("GATEWAY_PORT")), mux)
 }
 
 func createErrorResponse(status string, err error) string {
