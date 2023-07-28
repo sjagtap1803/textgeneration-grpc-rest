@@ -59,7 +59,7 @@ func run() error {
 	}
 
 	// Start HTTP server (and proxy calls to gRPC server endpoint)
-	fmt.Println("grpc gateway listening on port 50052")
+	fmt.Println("grpc gateway listening on port " + os.Getenv("GATEWAY_PORT"))
 	return http.ListenAndServe(fmt.Sprintf(":%s", os.Getenv("GATEWAY_PORT")), mux)
 }
 
