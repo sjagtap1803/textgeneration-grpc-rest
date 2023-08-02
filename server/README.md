@@ -3,4 +3,4 @@ The server uses the 'distilgpt2' model from HuggingFace to perform text generati
 ```
 $ python textgeneration_server.py
 ```
-The server runs at `localhost:50051` by default.
+The server runs at `localhost:50051` by default. This can be changed by editing `server_config.yaml`

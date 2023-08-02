@@ -18,8 +18,8 @@ The repo also contains scripts to re-generate gRPC code in both Python (`compile
 ```
 $ pip install -r requirements.txt
 ```
-### Go (Optional)
-Note: Follow the below instructions only if you wish to re-compile the proto files.
+### Go
+Note: Follow the second instruction only if you wish to re-compile the proto files.
 1. Download and install Go (https://go.dev/doc/install)
 2. Refer to the 'Prerequisites' section at https://grpc.io/docs/languages/go/quickstart/
 

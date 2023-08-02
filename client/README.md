@@ -1,5 +1,5 @@
 ## Text Generation Client
-This directory contains example scripts for gRPC as well as REST clients. In a new terminal, cd into this directory and run the following command from your virtual environment depending on the type of client:
+This directory contains example scripts for gRPC as well as REST clients. gRPC server/REST API addresses and port numbers can be changed by editing `client_config.yaml`. In a new terminal, cd into this directory and run the following command from your virtual environment depending on the type of client:
 * gRPC
 ```
 $ python textgeneration_client.py
